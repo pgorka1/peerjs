@@ -1,35 +1,33 @@
 import Peer from "peerjs";
 
-const subscribers = [];
+let peerIdSubscriber;
+let connectionInSubscriber;
+
 let connection = null;
 const peer = new Peer();
 
-const subscribeToOpen = (cb) => {
-    subscribers.push(cb);
+const subscribeToPeerId = (subscriber) => {
+    peerIdSubscriber = subscriber;
+};
+
+const subscribeToConnectionIn = (subscriber) => {
+    connectionInSubscriber = subscriber;
 };
 
 const connectToPeer = (id) => {
     connection = peer.connect(id);
-    connection.on('open', function () {
-        console.log('connection open, sending message')
-        connection.send('hi!');
-    });
+    return connection;
 };
 
-peer.on('connection', function(conn) {
-    conn.on('data', function(data){
-        // Will print 'hi!'
+peer.on('connection', function (conn) {
+    connectionInSubscriber(conn);
+    conn.on('data', function (data) {
         console.log(data);
     });
 });
 
 peer.on('open', function (id) {
-    subscribers.forEach(subscriber => subscriber(id));
-    if (connection) {
-        connection.on('data', function (data) {
-            console.log(data);
-        });
-    }
+    peerIdSubscriber(id);
 });
 
-export {peer, subscribeToOpen, connectToPeer}
+export {peer, subscribeToPeerId, connectToPeer, subscribeToConnectionIn}
