@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, {useEffect, useState} from 'react';
 import './App.css';
+import { subscribeToOpen, connectToPeer } from "./peer";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default () => {
+    const [peerId, setPeerId] = useState(null);
+    const [connection, setPeerConnection] = useState(null);
+    const [inputValue, setInputValue] = useState('');
+
+    const subscribeToOpenCb = (id) => {
+        console.log('Setting peer: ', id)
+        setPeerId(id);
+    };
+
+    useEffect(() => {
+        if (!peerId) subscribeToOpen(subscribeToOpenCb);
+    });
+
+    const onChangeInput = (event) => {
+        setInputValue(event.target.value);
+    };
+
+    const onClick = () => {
+        connectToPeer(inputValue)
+    };
+
+    return (
+        <div className="App">
+            peerjs demo with react
+            User peerId: {peerId}
+            <br />
+            <input value={inputValue} onChange={onChangeInput} type="text" />
+            <button onClick={onClick}>connect</button>
+        </div>
+    );
 }
-
-export default App;
