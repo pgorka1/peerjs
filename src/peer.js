@@ -16,6 +16,13 @@ const connectToPeer = (id) => {
     });
 };
 
+peer.on('connection', function(conn) {
+    conn.on('data', function(data){
+        // Will print 'hi!'
+        console.log(data);
+    });
+});
+
 peer.on('open', function (id) {
     subscribers.forEach(subscriber => subscriber(id));
     if (connection) {
